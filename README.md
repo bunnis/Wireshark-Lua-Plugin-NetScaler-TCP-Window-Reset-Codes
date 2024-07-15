@@ -50,8 +50,11 @@ After installation, Wireshark will automatically load the Lua plugin when it sta
 3. In the packet details pane, you will see the new custom field called "NetScaler TCP Reset - Window Error Code" added by the Lua plugin.
 4. Expand the new field. You will see the description along with the reset code. Sometimes the description is truncated, you can right-click to copy it. 
 
+Example View:
 ![Example View](images/example.png)
 
+Example Truncated View:
+![Example Truncated View](images/example_truncated.png)
 ## Contributing
 
 Contributions are welcome! 

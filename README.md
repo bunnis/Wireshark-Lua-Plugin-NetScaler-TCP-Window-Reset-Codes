@@ -58,7 +58,7 @@ Contributions are welcome!
 
 ## Buy Me a Coffee
 If you like this work and would like to support future development, please consider buying me a coffee:
-[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-red)](https://github.com/sponsors/bunnis)
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/abskulaity)
 
 ## License
 

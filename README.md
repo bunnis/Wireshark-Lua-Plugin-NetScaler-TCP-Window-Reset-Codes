@@ -56,6 +56,10 @@ After installation, Wireshark will automatically load the Lua plugin when it sta
 
 Contributions are welcome! 
 
+## Buy Me a Coffee
+If you like this work and would like to support future development, please consider buying me a coffee:
+[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-red)](https://github.com/sponsors/bunnis)
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE.txt) file for details.

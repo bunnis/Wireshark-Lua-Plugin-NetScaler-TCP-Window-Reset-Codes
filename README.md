@@ -45,7 +45,7 @@ After installation, Wireshark will automatically load the Lua plugin when it sta
 
 ### Example: Viewing the New Field
 
-1. Open a saved NetScaler capture file.
+1. Open a saved NetScaler capture file. You can use the file [nstrace1.cap](example_trace/nstrace1.cap) and the Wireshark filter ``tcp.flags.reset == 1`` to see all packets with and without the new field.
 2. Use the filter "(tcp.flags.reset == 1) && (tcp.window_size_value != 0)" to find NetScaler TCP Reset Packets.
 3. In the packet details pane, you will see the new custom field called "NetScaler TCP Reset - Window Error Code" added by the Lua plugin.
 4. Expand the new field. You will see the description along with the reset code. Sometimes the description is truncated, you can right-click to copy it. 

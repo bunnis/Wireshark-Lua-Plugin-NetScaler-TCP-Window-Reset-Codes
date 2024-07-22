@@ -1,4 +1,7 @@
+----------------------------------------
+-- script-name: netscaler_tcp_window_reset_codes_plugin.lua
 -- Author: Pedro Silva - July 2024
+-- Copyright (c) 2024, Pedro Silva
 -- https://github.com/bunnis/Wireshark-Lua-Plugin-NetScaler-TCP-Window-Reset-Codes
 -- Wireshark LUA script for adding support for Citrix NetScaler TCP Window Reset Codes
 -- Source https://support.citrix.com/article/CTX200852/citrix-adc-netscaler-reset-codes-reference
@@ -6,7 +9,7 @@
 -- 2024/07/10 - First draft
 
 
---resources
+-- resources
 -- https://mika-s.github.io/wireshark/lua/dissector/2018/12/16/creating-a-wireshark-dissector-in-lua-4.html
 -- https://gitlab.com/wireshark/wireshark/-/wikis/Lua/Examples#a-dissector-tutorial-script from Hadriel Kaplan
 -- we use the code from https://wiki.wireshark.org/Lua/Dissectors#chained-dissectors 
@@ -19,10 +22,21 @@
 -- end
 --local ip_proto_table = DissectorTable.get("ip.proto")
 --local original_tcp_dissector = ip_proto_table:get_dissector(6)
+----------------------------------------
+local debug_enabled = 0
+local dprint = function() end
+local function set_debug_level()
+    if debug_enabled > 0 then
+        dprint = function(...)
+            print(table.concat({"Lua:", ...}," "))
+        end
+    end
+end
+-- call it now
+set_debug_level()
 
-
---print("Wireshark version = ", get_version())
---print("Lua version = ", _VERSION)
+dprint("Wireshark version = ", get_version())
+dprint("Lua version = ", _VERSION)
 
 -- Reset code to description table
 -- Define a new protocol, but don't register it yet
@@ -31,15 +45,15 @@ local nstrace_tcp_rst_window_error_code = Proto("nstrace_tcp_rst_window_error_co
 -- Define the fields
 local f_tcp_rst_window_error_code_text = ProtoField.string("nstrace.tcp.rst.window_code.text", "Description") -- we use this field so that the description can be copied in the cases it is truncated. 
 -- Add our fields
-nstrace_tcp_rst_window_error_code.fields = {f_custom_string}
+-- nstrace_tcp_rst_window_error_code.fields = {f_custom_string}
 
 -- Define field extractors
---using tcp.window_size_value instead of tcp.window_size allows us to ignore window scaling into our final window value
+-- using tcp.window_size_value instead of tcp.window_size allows us to ignore window scaling into our final window value
 local f_tcp_window_size = Field.new("tcp.window_size_value")
 local f_tcp_flags_reset = Field.new("tcp.flags.reset")
 
 -- Define expert fields
---local expert_field_text = ProtoExpert.new("nstrace.tcp.rst.window_code.text", "NetScaler TCP Reset - Window Error Description", expert.group.COMMENTS_GROUP, expert.severity.COMMENT)
+-- local expert_field_text = ProtoExpert.new("nstrace.tcp.rst.window_code.text", "NetScaler TCP Reset - Window Error Description", expert.group.COMMENTS_GROUP, expert.severity.COMMENT)
 local expert_field_code = ProtoExpert.new("nstrace.tcp.rst.window_code.code", "NetScaler TCP Reset - Window Error Code", expert.group.COMMENTS_GROUP, expert.severity.COMMENT)
 
 -- Add our expert fields
@@ -268,10 +282,8 @@ local window_rst_code_dict = {
     [10042] = "SIPALG: Pre translation ops failed."
 }
 
+dprint("Citrix NetScaler Reset Code Reference script loaded")
 
-
-
-print("Citrix NetScaler Reset Code Reference script loaded")
 -- Dissection function
 function nstrace_tcp_rst_window_error_code.dissector(buffer, pinfo, tree)
     -- Pseudo
@@ -281,7 +293,7 @@ function nstrace_tcp_rst_window_error_code.dissector(buffer, pinfo, tree)
 	--      However, the capture doesn't need to be done at the netscaler to see these reset codes
 	-- 3 - Extract Window value
 	-- 4 - Check if value is on the table, if it's found then we add our new TreeItem
-	
+   dprint("called dissector")
 	local tcp_dissector_table = DissectorTable.get("tcp.port")
     local tcp_dissector = tcp_dissector_table:get_dissector(pinfo.dst_port)
 	-- Ensure the packet is TCP
@@ -289,28 +301,30 @@ function nstrace_tcp_rst_window_error_code.dissector(buffer, pinfo, tree)
 	then 
 		return 
     end
+	dprint("packet is TCP")	
 	-- Check if the TCP reset flag is set, returns 1 if True, 0 if False
     local tcp_reset_flag = f_tcp_flags_reset()
-	-- print("tcp reset flag is", tostring(tcp_reset_flag))
-    if tostring(tcp_reset_flag) == 'True' then  -- 1 indicates the reset flag is set
-	    --print("entrou")
-		
-		
-	-- Extract TCP Window Size
-	local window_size = tonumber(tostring(f_tcp_window_size()))
+	dprint("TCP reset flag is", tostring(tcp_reset_flag))
+    
 	
-	-- Look up the description based on window size
-	local window_description = window_rst_code_dict[window_size]
-	
-	-- If a description was found, add the tree
-	if window_description == nil 
-	then 
-		return 
-	else
-		local subtree = tree:add(nstrace_tcp_rst_window_error_code, buffer(), "NetScaler TCP Reset - Window Error Code")
-		subtree:add(f_tcp_rst_window_error_code_text, window_description)
-		subtree:add_proto_expert_info(expert_field_code,tostring(window_size))
-	end
+	if ( tostring(tcp_reset_flag) == "1" ) or ( tostring(tcp_reset_flag) == 'True' ) then  -- both checks fix LUA issues with WIreshark 4.0.10 and 4.2.6
+		dprint("extracting window_size")
+		-- Extract TCP Window Size
+		local window_size = tonumber(tostring(f_tcp_window_size()))
+		
+		-- Look up the description based on window size
+		local window_description = window_rst_code_dict[window_size]
+		dprint("window_size is ")
+		-- If a description was found, add the tree
+		if window_description == nil 
+		then 
+			return 
+		else
+			dprint("adding netscaler window error code tree")
+			local subtree = tree:add(nstrace_tcp_rst_window_error_code, buffer(), "NetScaler TCP Reset - Window Error Code")
+			subtree:add(f_tcp_rst_window_error_code_text, window_description)
+			subtree:add_proto_expert_info(expert_field_code,tostring(window_size))
+		end
 	
 		
 	end	
@@ -318,9 +332,8 @@ function nstrace_tcp_rst_window_error_code.dissector(buffer, pinfo, tree)
 end
 
 
-
 -- Register the dissector and take its place in the dissector table
---ip_proto_table:add(6, nstrace_tcp_rst_window_error_code)
+-- ip_proto_table:add(6, nstrace_tcp_rst_window_error_code)
 
 -- Register the post-dissector 
 register_postdissector(nstrace_tcp_rst_window_error_code)

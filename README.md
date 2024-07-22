@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository contains a Lua plugin for Wireshark that adds a new field to the packet details tree, specifically enhancing it with NetScaler TCP Window Reset Code Description. This plugin can be useful for custom analysis and dissection of network traffic related to NetScaler related traffic.
+This repository contains a Lua plugin for Wireshark that adds a new field to the packet details tree, specifically enhancing it with NetScaler TCP Window Reset Code Description. This plugin can be useful for custom analysis and dissection of network traffic related to NetScaler traffic.
 
 ## Features
 

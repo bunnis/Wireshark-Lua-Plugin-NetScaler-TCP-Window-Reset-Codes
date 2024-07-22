@@ -293,9 +293,12 @@ function nstrace_tcp_rst_window_error_code.dissector(buffer, pinfo, tree)
 	--      However, the capture doesn't need to be done at the netscaler to see these reset codes
 	-- 3 - Extract Window value
 	-- 4 - Check if value is on the table, if it's found then we add our new TreeItem
-   dprint("called dissector")
-	local tcp_dissector_table = DissectorTable.get("tcp.port")
-    local tcp_dissector = tcp_dissector_table:get_dissector(pinfo.dst_port)
+    dprint("called dissector")
+	local tcp_dissector_table = DissectorTable.get("ip.proto")
+	dprint("got tcp dissector table")
+    local tcp_dissector = tcp_dissector_table:get_dissector("6")
+	
+	
 	-- Ensure the packet is TCP
 	if tcp_dissector == nil 
 	then 

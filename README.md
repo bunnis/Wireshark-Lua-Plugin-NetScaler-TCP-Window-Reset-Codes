@@ -1,6 +1,6 @@
 # Wireshark Lua Plugin to Enhance Packet Details View with NetScaler TCP Window Reset Codes
 
-** 🚀 Launchpad: Note: As of Wireshark 4.4.0 (28th August 2024) the functionality of this plugin is included by default within the TCP dissector  [see merge 16524](https://gitlab.com/wireshark/wireshark/-/merge_requests/16524?commit_id=329845b000037e2b9d94c6db832283deac228517)**
+## 🚀 s of Wireshark 4.4.0 (28th August 2024) the functionality of this plugin is included by default within the TCP dissector  [(merge 16524)](https://gitlab.com/wireshark/wireshark/-/merge_requests/16524?commit_id=329845b000037e2b9d94c6db832283deac228517)
 
 ## Overview
 
